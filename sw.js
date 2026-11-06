@@ -1,0 +1,4 @@
+const CACHE='korklar-web-1';const BASE=new URL('./',self.location.href);const FILES=['','index.html','style.css','app.js','manifest.webmanifest','data/sv.json','data/sq.json','images/HeroRoad.png','images/AppMark.png'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(p=>new URL(p,BASE).href)))));
+self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin||e.request.headers.has('range'))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok&&r.type==='basic'&&!e.request.url.endsWith('.mp4')){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy))}return r}).catch(()=>caches.match(e.request).then(r=>r||(e.request.mode==='navigate'?caches.match(new URL('index.html',BASE).href):Response.error()))))});
